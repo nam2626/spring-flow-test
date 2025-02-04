@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+  <th:block th:include="~{fragments/header.html}"></th:block>
+  <hr>
+  <div class="container">
+    <!-- 게시판 글 목록 출력 -->
+     <h2>게시글 목록</h2>
+     <table class="board-table">
+      <thead>
+        <tr>
+          <th>번호</th>
+          <th>제목</th>
+          <th>작성자</th>
+          <th>작성일</th>
+          <th>조회수</th>
+          <th>좋아요</th>
+          <th>싫어요</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="board : ${list}">
+          <td>[[${board.bno}]]</td>
+          <td><a th:href="@{/board/{bno}(bno=${board.bno})}">[[${board.title}]]</a></td>
+          <td>[[${board.id}]]</td>
+          <td>[[${board.writeDate}]]</td>
+          <td>[[${board.bcount}]]</td>
+          <td>[[${board.blike}]]</td>
+          <td>[[${board.bhate}]]</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="7">
+            <!-- 이전 페이지 그룹 이동 -->
+            <a th:if="${pagging.priviousPageGroup}" th:href="@{/main(pageNo=${pagging.startPageOfPageGroup-1},pageContentEa=${pagging.pageOfContentCount})}">◀</a>
+            <!-- 페이지 번호 출력 -->
+            <a th:href="@{/main(pageNo=${i},pageContentEa=${pagging.pageOfContentCount})}" th:each="i : ${#numbers.sequence(pagging.startPageOfPageGroup,pagging.endPageOfPageGroup)}">[[${i}]]</a>
+            <!-- 다음 페이지 그룹 이동 -->
+            <a th:if="${pagging.nextPageGroup}" th:href="@{/main(pageNo=${pagging.endPageOfPageGroup+1},pageContentEa=${pagging.pageOfContentCount})}">▶</a>
+
+          </td>
+        </tr>
+
+      </tfoot>
+    </table>
+  </div>
+</body>
+</html>

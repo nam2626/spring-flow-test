@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script>
+    function deleteMember(id) {
+      fetch('/member/delete',{
+            method : "DELETE",
+            headers : {
+              "Content-Type" : "application/json"
+            },
+            body : JSON.stringify({id})
+          }).then(response => response.json()).then(result => {
+            console.log(result);
+            alert(result.msg);
+            updateTable(result.list);
+      })
+    }
+    function updateMember(item){
+      fetch('/member/update',{
+        method : 'PUT',
+        headers : {
+          "Content-Type" : "application/json"
+        },
+        body : JSON.stringify(item)
+      }).then(response => response.json())
+      .then(result => {
+        alert(result.msg);
+        updateTable(result.list);
+      });
+    }
+    function updateTable(list) {
+      let tag = '';
+      list.forEach((item) => {
+                tag += `<tr>
+                  <td><input type="text" class="id" readonly value="${item.id}"></td>
+                  <td><input type="text" class="userName" value="${item.userName}"></td>
+                  <td><input type="text" class="nickName" value="${item.nickName}"></td>
+                  <td>
+                    <select name="grade" class="grade">
+                      <option value="0" ${item.grade == 0 ? 'selected' : ''}>Bronze</option>
+                      <option value="1" ${item.grade == 1 ? 'selected' : ''}>Silver</option>
+                      <option value="2" ${item.grade == 2 ? 'selected' : ''}>Gold</option>
+                      <option value="3" ${item.grade == 3 ? 'selected' : ''}>VIP</option>
+                      <option value="4" ${item.grade == 4 ? 'selected' : ''}>VVIP</option>
+                      <option value="5" ${item.grade == 5 ? 'selected' : ''}>Admin</option>
+                    </select>
+                  </td>
+                  <td>
+                    <button class="btn_update">수정</button>
+                    <button class="btn_delete">삭제</button>
+                  </td>
+                </tr>`;
+              });
+              document.querySelector('tbody').innerHTML = tag;
+    }
+    function updateColumnMember(item){
+      fetch('/member/updateColumn',{
+        method : 'PATCH',
+        headers : {
+          "Content-Type" : "application/json"
+        },
+        body : JSON.stringify(item)
+      }).then(response => response.json())
+      .then(result => {
+        console.log(result.msg);
+        //updateTable(result.list);
+      });
+      
+    }
+    window.onload = () => {
+      document.querySelector('tbody').onclick = (e) =>{
+        console.log(e.target);
+        if(e.target.className == 'btn_delete'){
+          const id = e.target.parentNode.parentNode.querySelector('.id').value;
+          deleteMember(id);
+        }else if(e.target.className == 'btn_update'){
+          //데이터 수정 작업
+          //암호를 제외한 수정 작업 진행 - PUT
+          console.log(e.target.parentNode.parentNode.querySelectorAll('input, select'));
+          let obj = {};
+          //수정 버튼을 클릭한 줄의 전체 데이터를 읽어옴
+          e.target.parentNode.parentNode.querySelectorAll('input, select').forEach(item => {
+            obj = {...obj, [item.className] : item.value};
+          })
+          console.log(obj);
+          updateMember(obj);
+        }
+      }
+
+      document.querySelectorAll('tbody input, tbody select').forEach(item => {
+        item.onchange = (e) => {
+          const id = e.target.parentNode.parentNode.querySelector('.id').value;
+          const obj = {
+            column : e.target.className,
+            value : e.target.value,
+            id : id
+          };
+          updateColumnMember(obj);
+        }
+      })
+    }
+
+  </script>
+</head>
+<body>  
+  <th:block th:include="~{fragments/header.html}"></th:block>
+
+  <hr>
+  <div class="container">
+    <h2>회원 관리 페이지</h2>
+    <hr>
+    <table>
+      <thead>
+        <tr>
+          <th>아이디</th>
+          <th>이름</th>
+          <th>닉네임</th>
+          <th>회원등급</th>
+          <th>비고</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="member : ${list}">
+          <td><input type="text" class="id" readonly th:value="${member.id}"></td>
+          <td><input type="text" class="userName" th:value="${member.userName}"></td>
+          <td><input type="text" class="nickName" th:value="${member.nickName}"></td>
+          <td>
+            <select name="grade" class="grade">
+              <option value="0" th:selected="${member.grade == 0}">Bronze</option>
+              <option value="1" th:selected="${member.grade == 1}">Silver</option>
+              <option value="2" th:selected="${member.grade == 2}">Gold</option>
+              <option value="3" th:selected="${member.grade == 3}">VIP</option>
+              <option value="4" th:selected="${member.grade == 4}">VVIP</option>
+              <option value="5" th:selected="${member.grade == 5}">Admin</option>
+            </select>
+          </td>
+          <td>
+            <button class="btn_update">수정</button>
+            <button class="btn_delete">삭제</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
