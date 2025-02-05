@@ -42,12 +42,12 @@ jobs:
         ssh-private-key: ${{secrets.SERVER_SSH_KEY}}
     - name: Add Host
       run: |
-        ssh-keyscan -t ed25519 ec2-13-125-1-211.ap-northeast-2.compute.amazonaws.com >> ~/.ssh/known_hosts
+        ssh-keyscan -t ed25519 43.201.84.62 >> ~/.ssh/known_hosts
     - name: Deploy to Server # 운영서버에 /home/ubuntu 폴더에 빌드가 완료된 jar 파일을 복사
-      run: scp target/*.jar ubuntu@ec2-13-125-1-211.ap-northeast-2.compute.amazonaws.com:~/
+      run: scp target/*.jar ubuntu@43.201.84.62:~/
     - name: Run SSH Commands
       run: |
-        ssh -i ~/.ssh/id_rsa ubuntu@ec2-13-125-1-211.ap-northeast-2.compute.amazonaws.com << 'EOF'
+        ssh -i ~/.ssh/id_rsa ubuntu@43.201.84.62 << 'EOF'
         pkill -f 'java -jar' || true
         nohup java -jar ~/*.jar > log.txt 2>&1 &
         EOF
